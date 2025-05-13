@@ -1,1 +1,98 @@
-hai pantek
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Access Google Form with Location Permission</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+  #message {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    color: #333;
+  }
+  iframe {
+    width: 100%;
+    max-width: 700px;
+    height: 600px;
+    border: none;
+    border-radius: 8px;
+  }
+  button {
+    padding: 12px 25px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+  <h1>Google Form Access with Location Permission</h1>
+  <div id="message">Please allow location access to continue.</div>
+  <button id="request-location">Allow Location & Continue</button>
+  <div id="form-container" style="display:none;">
+    <iframe id="form-frame" src="https://docs.google.com/forms/d/e/1FAIpQLSdhrtQwJCiqxpUTTHOAPESdJAX_cDcdY1_eWw8Z89G8cCEB7g/viewscore?viewscore=AE0zAgAFD5w3jg9lEqmTq1GMYv9p7vbgIhDMYEMhs4DIZKPWsX2fQgnGUNgau92b1w" title="Google Form Scores"></iframe>
+  </div>
+  <script>
+    const messageEl = document.getElementById('message');
+    const btn = document.getElementById('request-location');
+    const formContainer = document.getElementById('form-container');
+
+    btn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        messageEl.textContent = "Geolocation is not supported by your browser.";
+        return;
+      }
+      messageEl.textContent = "Requesting location permission...";
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const {latitude, longitude} = position.coords;
+          // Send location data to your server or handle internally
+          // For demonstration, we just log it and proceed
+          console.log('User location:', latitude, longitude);
+          messageEl.textContent = `Location received: (${latitude.toFixed(5)}, ${longitude.toFixed(5)}). Loading form...`;
+          btn.style.display = 'none';
+          formContainer.style.display = 'block';
+
+          // Optional: Open Google Maps with user location in new tab
+          // window.open(`https://maps.google.com/?q=${latitude},${longitude}`, '_blank');
+        },
+        (error) => {
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              messageEl.textContent = "Location access denied. Please allow location access to continue.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              messageEl.textContent = "Location information is unavailable.";
+              break;
+            case error.TIMEOUT:
+              messageEl.textContent = "The request to get your location timed out.";
+              break;
+            default:
+              messageEl.textContent = "An unknown error occurred.";
+          }
+        }
+      );
+    });
+  </script>
+</body>
+</html>
+
+  
